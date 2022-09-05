@@ -2,6 +2,15 @@ name: Docker Build and Push
 
 on:
   workflow_call:
+    inputs:
+      repo_name:
+        required: true
+        type: string
+    secrets:
+      DOCKERHUB_USERENAME:
+        required: true
+      DOCKERHUB_PASSWORD:
+        required: true
 
 jobs:
   docker:
@@ -28,6 +37,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.repo_name }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

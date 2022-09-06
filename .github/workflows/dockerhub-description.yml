@@ -3,7 +3,7 @@ name: Update Docker Hub Description
 on:
   workflow_call:
     inputs:
-      repo_name:
+      dockerhub_repo_name:
         required: true
         type: string
     secrets:
@@ -25,5 +25,5 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.repo_name }}
+        repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.dockerhub_repo_name }}
         short-description: ${{ github.event.repository.description }}

@@ -7,7 +7,7 @@ Peronal GitHub Actions for Docker Hub
 Automatically builds and pushes images to Docker Hub.
 
 Required Inputs:
-- `repo_name`
+- `dockerhub_repo_name`
 
 Required Secrets:
 - `DOCKERHUB_USERNAME`
@@ -19,7 +19,7 @@ jobs:
   call-dockerhub-action:
     uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub_build_push.yml@main
     with:
-      repo_name: name of repo
+      dockerhub_repo_name: name of repo
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -29,7 +29,7 @@ jobs:
 Automatically updates the Docker Hub readme with the contents of the README.md file in the GitHub repo.
 
 Required Inputs:
-- `repo_name`
+- `dockerhub_repo_name`
 
 Required Secrets:
 - `DOCKERHUB_USERNAME`
@@ -41,7 +41,7 @@ jobs:
   call-dockerhub-action:
     uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub-description.yml@main
     with:
-      repo_name: name of repo
+      dockerhub_repo_name: name of repo
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

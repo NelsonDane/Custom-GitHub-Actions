@@ -9,6 +9,9 @@ Automatically builds and pushes images to Docker Hub.
 Required Inputs:
 - `dockerhub_repo_name`
 
+Optional Inputs:
+- `image_tag`: (defaults to `latest`)
+
 Required Secrets:
 - `DOCKERHUB_USERNAME`
 - `DOCKERHUB_PASSWORD`

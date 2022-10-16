@@ -7,10 +7,11 @@ Peronal GitHub Actions for Docker Hub
 Automatically builds and pushes images to Docker Hub.
 
 Required Inputs:
-- `dockerhub_repo_name`
+- `dockerhub_repo_name`: (for when it's different than GitHub's repo name)
 
 Optional Inputs:
 - `image_tag`: (defaults to `latest`)
+- `platforms`: (defaults to `linux/amd64`)
 
 Required Secrets:
 - `DOCKERHUB_USERNAME`
@@ -24,6 +25,7 @@ jobs:
     with:
       dockerhub_repo_name: name of repo
       image_tag: (optional)
+      platforms: (optional, comma-seperated with no spaces)
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

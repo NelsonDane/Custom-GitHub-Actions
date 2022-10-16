@@ -6,6 +6,10 @@ on:
       dockerhub_repo_name:
         required: true
         type: string
+      platforms:
+        required: false
+        type: string
+        default: linux/amd64
       image_tag:
         required: false
         type: string
@@ -41,6 +45,7 @@ jobs:
         with:
           context: .
           push: true
+          platforms: ${{ inputs.platforms }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.dockerhub_repo_name }}:${{ inputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

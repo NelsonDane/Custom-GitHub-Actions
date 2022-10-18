@@ -16,7 +16,7 @@ on:
         default: latest
       dockerfile:
         type: string
-        default: ./Dockerfile
+        default: ./
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -47,6 +47,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
+          if: "${{ github.event.inputs.dockerfile != '' }}"
           file: ${{ inputs.dockerfile }}
           push: true
           platforms: ${{ inputs.platforms }}

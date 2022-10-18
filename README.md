@@ -12,7 +12,6 @@ Required Inputs:
 Optional Inputs:
 - `image_tag`: (defaults to `latest`)
 - `platforms`: (defaults to `linux/amd64`)
-- `dockerfile`: (defaults to `./Dockerfile`)
 
 Required Secrets:
 - `DOCKERHUB_USERNAME`
@@ -27,7 +26,6 @@ jobs:
       dockerhub_repo_name: name of repo
       image_tag: (optional)
       platforms: (optional, comma-seperated with no spaces)
-      dockerfile: (optional, relative path)
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

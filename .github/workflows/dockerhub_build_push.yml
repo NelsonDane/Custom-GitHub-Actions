@@ -14,6 +14,9 @@ on:
         required: false
         type: string
         default: latest
+      dockerfile:
+        type: string
+        default: .
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -44,6 +47,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
+          file: ${{ inputs.dockerfile }}
           push: true
           platforms: ${{ inputs.platforms }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.dockerhub_repo_name }}:${{ inputs.image_tag }}

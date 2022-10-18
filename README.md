@@ -12,7 +12,7 @@ Required Inputs:
 Optional Inputs:
 - `image_tag`: (defaults to `latest`)
 - `platforms`: (defaults to `linux/amd64`)
-- `dockerfile`: (defaults to `.`)
+- `dockerfile`: (defaults to `./Dockerfile`)
 
 Required Secrets:
 - `DOCKERHUB_USERNAME`

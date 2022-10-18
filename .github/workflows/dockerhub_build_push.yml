@@ -16,7 +16,7 @@ on:
         default: latest
       dockerfile:
         type: string
-        default: .
+        default: ./Dockerfile
     secrets:
       DOCKERHUB_USERNAME:
         required: true

@@ -59,7 +59,7 @@ jobs:
           images: ${{ inputs.dockerhub_repo_name }}:${{ inputs.image_tag }}
       -
         name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}

@@ -10,10 +10,11 @@ Required Inputs:
 - `dockerhub_repo_name`: (for when it's different than GitHub's repo name)
 
 Optional Inputs:
-- `image_tag`: (defaults to `latest`)
 - `platforms`: (defaults to `linux/amd64`)
+- `image_tag`: (defaults to `latest`)
+- `should_push`: (defaults to `false`)
 
-Required Secrets:
+Optional Secrets:
 - `DOCKERHUB_USERNAME`
 - `DOCKERHUB_PASSWORD`
 
@@ -24,8 +25,9 @@ jobs:
     uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub_build_push.yml@main
     with:
       dockerhub_repo_name: name of repo
-      image_tag: (optional)
       platforms: (optional, comma-seperated with no spaces)
+      image_tag: (optional)
+      should_push: (optional)
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

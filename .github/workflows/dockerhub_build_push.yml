@@ -56,7 +56,7 @@ jobs:
         uses: docker/metadata-action@v5
         id: metadata
         with:
-          images: ${{ inputs.dockerhub_repo_name }}:${{ inputs.image_tag }}
+          images: ${{ inputs.image_tag }}
       -
         name: Build and push
         uses: docker/build-push-action@v5

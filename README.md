@@ -7,7 +7,7 @@ Peronal GitHub Actions for Docker Hub
 Automatically builds and pushes images to Docker Hub.
 
 Required Inputs:
-- `dockerhub_repo_name`: (for when it's different than GitHub's repo name)
+- `image_name`: (name of image)
 
 Optional Inputs:
 - `platforms`: (defaults to `linux/amd64`)
@@ -18,13 +18,22 @@ Optional Secrets:
 - `DOCKERHUB_USERNAME`
 - `DOCKERHUB_PASSWORD`
 
+Minimal Config (Only builds, does not push):
+```yaml
+jobs:
+  call-dockerhub-action:
+    uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub_build_push.yml@main
+    with:
+      image_name: name of image
+```
+
 Example Config:
 ```yaml
 jobs:
   call-dockerhub-action:
     uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub_build_push.yml@main
     with:
-      dockerhub_repo_name: name of repo
+      image_name: name of image
       platforms: (optional, comma-seperated with no spaces)
       image_tag: (optional)
       should_push: (optional)
@@ -37,7 +46,7 @@ jobs:
 Automatically updates the Docker Hub readme with the contents of the README.md file in the GitHub repo.
 
 Required Inputs:
-- `dockerhub_repo_name`
+- `image_name`
 
 Required Secrets:
 - `DOCKERHUB_USERNAME`
@@ -49,7 +58,7 @@ jobs:
   call-dockerhub-action:
     uses: NelsonDane/DockerHub-Actions/.github/workflows/dockerhub-description.yml@main
     with:
-      dockerhub_repo_name: (name of repo)
+      image_name: (name of image)
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

@@ -59,6 +59,6 @@ jobs:
           push: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
           platforms: ${{ inputs.platforms }}
           # If there's a username, set to username/image_name:tag, otherwise just image_name:tag
-          tags: ${{ env.DOCKER_USERNAME != null && format('{0}/', secrets.DOCKER_USERNAME) || '' }}${{ inputs.image_name }}:${{ inputs.image_tag }}
+          tags: ${{ env.DOCKER_USERNAME != null && format('{0}/', env.DOCKER_USERNAME) || '' }}${{ inputs.image_name }}:${{ inputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -52,19 +52,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       -
-        name: Set up metadata
-        uses: docker/metadata-action@v5
-        id: metadata
-        with:
-          images: docker.io/${{ inputs.dockerhub_repo_name }}
-          tags: ${{ inputs.image_tag }}
-      -
         name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
           platforms: ${{ inputs.platforms }}
-          tags: ${{ steps.metadata.outputs.tags }}
+          tags: docker.io/${{ inputs.dockerhub_repo_name }}:${{ inputs.image_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

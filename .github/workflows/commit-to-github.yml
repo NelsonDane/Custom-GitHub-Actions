@@ -5,14 +5,17 @@ on:
     inputs:
       name:
         description: 'Name of Commiter'
+        type: string
         required: false
         default: 'github-actions'
       email:
         description: 'Email of Commiter'
+        type: string
         required: false
         default: 'github-actions@github.com'
       message:
         description: 'Commit Message'
+        type: string
         required: false
         default: 'github actions generated commit'
 

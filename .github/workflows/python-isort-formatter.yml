@@ -29,7 +29,11 @@ jobs:
           pip install autoflake
           autoflake --in-place --remove-all-unused-imports --remove-unused-variables --recursive .
       -
-        name: Commit changes
-        uses: ./commit-to-github.yml
-        with:
-          message: "Auto-format with isort"
+        name: Push changes to GitHub
+        run: |
+          date > generated.txt
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Auto-format with Black"
+          git push

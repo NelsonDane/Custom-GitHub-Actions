@@ -21,7 +21,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install black
           ${{ github.event.inputs.command }}
-  commit:
-    uses: NelsonDane/Custom-GitHub-Actions/.github/workflows/commit-to-github.yml@main
-    with:
-      message: "Auto-format with Black"
+      -
+        name: Push changes to GitHub
+        run: |
+          date > generated.txt
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Auto-format with Black"
+          git push

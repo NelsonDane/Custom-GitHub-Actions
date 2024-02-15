@@ -21,8 +21,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install black
           ${{ github.event.inputs.command }}
-      -
-        name: Commit changes
-        uses: NelsonDane/Custom-GitHub-Actions/.github/workflows/commit-to-github.yml@main
-        with:
-          message: "Auto-format with Black"
+  commit:
+    uses: NelsonDane/Custom-GitHub-Actions/.github/workflows/commit-to-github.yml@main
+    with:
+      message: "Auto-format with Black"

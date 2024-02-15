@@ -1,0 +1,35 @@
+name: Python isort Formatter
+
+on:
+  workflow_call:
+    inputs:
+      isort_command:
+        description: 'The isort command to run'
+        type: string
+        required: false
+        default: 'isort .'
+
+jobs:
+  isort:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Sort imports
+        run: |
+          python -m pip install --upgrade pip
+          pip install isort
+          ${{ github.event.inputs.isort_command }}
+      -
+        name: Remove unused imports
+        run: |
+          python -m pip install --upgrade pip
+          pip install autoflake
+          autoflake --in-place --remove-all-unused-imports --remove-unused-variables --recursive .
+      -
+        name: Commit changes
+        uses: NelsonDane/Custom-GitHub-Actions/.github/workflows/commit-to-github.yml@main
+        with:
+          message: "Auto-format with isort"

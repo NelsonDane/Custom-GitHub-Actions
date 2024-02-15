@@ -28,8 +28,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install autoflake
           autoflake --in-place --remove-all-unused-imports --remove-unused-variables --recursive .
-  commit:
-    name: Commit changes
-    uses: NelsonDane/Custom-GitHub-Actions/.github/workflows/commit-to-github.yml@main
-    with:
-      message: "Auto-format with isort"
+      -
+        name: Commit changes
+        uses: ./commit-to-github.yml
+        with:
+          message: "Auto-format with isort"

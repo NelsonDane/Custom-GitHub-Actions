@@ -1,4 +1,4 @@
-# Cusotm-GitHub-Actions
+# Custom-GitHub-Actions
 Personal GitHub Actions for Docker Containers and Code Formatting
 
 ## How to use (for future self)
@@ -62,4 +62,34 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+```
+
+### Format Python Code with Black
+Automatically formats Python code with Black.
+
+Optional Inputs:
+- `black_command`: (defaults to `black .`)
+
+Example Config:
+```yaml
+jobs:
+  call-dockerhub-action:
+    uses: NelsonDane/Cusotm-GitHub-Actions/.github/workflows/python-black-formatter.yml@main
+    with:
+      black_command: (optional)
+```
+
+### Format Python Imports with isort
+Automatically formats Python imports with isort and removes unused imports.
+
+Optional Inputs:
+- `isort_command`: (defaults to `isort .`)
+
+Example Config:
+```yaml
+jobs:
+  call-dockerhub-action:
+    uses: NelsonDane/Cusotm-GitHub-Actions/.github/workflows/python-isort-formatter.yml@main
+    with:
+      isort_command: (optional)
 ```

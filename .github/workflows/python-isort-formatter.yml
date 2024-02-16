@@ -31,9 +31,17 @@ jobs:
           pip install autoflake
           autoflake --in-place --remove-all-unused-imports --remove-unused-variables --recursive .
       -
-        name: Push changes to GitHub
+        name: Check for changes
+        id: check_changes
         run: |
-          date > generated.txt
+          if git diff --quiet; then
+            echo "No changes to the code"
+            exit 1
+          fi
+      -
+        name: Push changes to GitHub
+        if: steps.check_changes.outcome == 'success'
+        run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .

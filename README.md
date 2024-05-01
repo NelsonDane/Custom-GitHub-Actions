@@ -11,6 +11,7 @@ Required Inputs:
 
 Optional Inputs:
 - `context`: (defaults to `.`)
+- `dockerfile`: (defaults to `Dockerfile`)
 - `platforms`: (defaults to `linux/amd64,linux/arm64,linux/arm/v7`)
 - `image_tag`: (defaults to `latest`)
 - `should_push`: (defaults to `false`)

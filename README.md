@@ -10,7 +10,8 @@ Required Inputs:
 - `image_name`: (name of image)
 
 Optional Inputs:
-- `platforms`: (defaults to `linux/amd64`)
+- `context`: (defaults to `.`)
+- `platforms`: (defaults to `linux/amd64,linux/arm64,linux/arm/v7`)
 - `image_tag`: (defaults to `latest`)
 - `should_push`: (defaults to `false`)
 

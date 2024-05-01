@@ -7,11 +7,16 @@ on:
       image_name:
         required: true
         type: string
+      # Dockerfile Context
+      context:
+        required: false
+        type: string
+        default: .
       # Platforms to build for
       platforms:
         required: false
         type: string
-        default: linux/amd64
+        default: linux/amd64,linux/arm64,linux/arm/v7
       # Image tag
       image_tag:
         required: false
@@ -55,7 +60,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ${{ inputs.context }}
           push: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
           platforms: ${{ inputs.platforms }}
           # If there's a username, set to username/image_name:tag, otherwise just image_name:tag

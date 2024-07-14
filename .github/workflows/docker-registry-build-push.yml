@@ -12,6 +12,16 @@ on:
         required: false
         type: string
         default: docker.io
+      # Context
+      context:
+        required: false
+        type: string
+        default: .
+      # Dockerfile
+      dockerfile:
+        required: false
+        type: string
+        default: Dockerfile
       # Platforms to build for
       platforms:
         required: false
@@ -62,7 +72,8 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ${{ inputs.context }}
+          file: ${{ inputs.dockerfile }}
           push: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
           platforms: ${{ inputs.platforms }}
           # If there's a username, set to username/image_name:tag, otherwise just image_name:tag

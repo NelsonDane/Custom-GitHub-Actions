@@ -1,0 +1,71 @@
+name: Docker Build and Push to Registry
+
+on:
+  workflow_call:
+    inputs:
+      # Repository name
+      image_name:
+        required: true
+        type: string
+      # Registry URL
+      registry:
+        required: false
+        type: string
+        default: docker.io
+      # Platforms to build for
+      platforms:
+        required: false
+        type: string
+        default: linux/amd64
+      # Image tag
+      image_tag:
+        required: false
+        type: string
+        default: latest
+      # Whether to push the image to the registry
+      should_push:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      DOCKER_REGISTRY_USERNAME:
+        required: false
+      DOCKER_REGISTRY_PASSWORD:
+        required: false
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ${{ inputs.registry }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v3
+        if: ${{ env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
+          platforms: ${{ inputs.platforms }}
+          # If there's a username, set to username/image_name:tag, otherwise just image_name:tag
+          tags: ${{ env.DOCKER_USERNAME != null && format('{0}/', env.DOCKER_USERNAME) || '' }}${{ inputs.image_name }}:${{ inputs.image_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

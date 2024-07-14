@@ -69,6 +69,14 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
       -
+        name: Docker Meta/Sanitize
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # If there's a username, set to registry/username/image_name, otherwise just image_name
+          images: ${{ env.DOCKER_USERNAME != null && format('{0}/{1}/', env.REGISTRY, env.DOCKER_USERNAME) || '' }}${{ inputs.image_name }}
+          tags: ${{ inputs.image_tag }}
+      -
         name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -76,7 +84,6 @@ jobs:
           file: ${{ inputs.dockerfile }}
           push: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
           platforms: ${{ inputs.platforms }}
-          # If there's a username, set to registry/username/image_name:tag, otherwise just image_name:tag
-          tags: ${{ env.DOCKER_USERNAME != null && format('{0}/{1}/', env.REGISTRY, env.DOCKER_USERNAME) || '' }}${{ inputs.image_name }}:${{ inputs.image_tag }}
+          tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

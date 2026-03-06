@@ -1,18 +1,21 @@
-name: Update Docker Hub Description
+name: GitHub Security Workflow
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - "*"
+  workflow_call:
 
 jobs:
   security:
-    name: Workflow Security
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-      # - uses: ./templates/security.yaml
+      - name: Run Zizmor
+        uses: zizmorcore/zizmor-action@0dce2577a4760a2749d8cfb7a84b7d5585ebcb7d
+        with:
+          persona: "auditor"

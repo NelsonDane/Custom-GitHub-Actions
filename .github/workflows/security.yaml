@@ -1,0 +1,16 @@
+name: Update Docker Hub Description
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  security:
+    name: Workflow Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: ./templates/security.yaml

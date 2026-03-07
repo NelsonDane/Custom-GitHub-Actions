@@ -16,6 +16,6 @@ jobs:
         with:
           persist-credentials: false
       - name: Run Zizmor
-        uses: zizmorcore/zizmor-action@0dce2577a4760a2749d8cfb7a84b7d5585ebcb7d
+        uses: zizmorcore/zizmor-action@c65bc8876171b6d82748ec98b77c0193b1226b94
         with:
           persona: "auditor"

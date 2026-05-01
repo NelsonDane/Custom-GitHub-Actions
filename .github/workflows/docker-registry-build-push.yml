@@ -22,7 +22,7 @@ on:
         required: false
         type: string
         default: Dockerfile
-      # Platforms to build for
+      # Platforms to build for (comma-separated)
       platforms:
         required: false
         type: string
@@ -42,7 +42,7 @@ on:
       use_native_runners:
         required: false
         type: boolean
-        default: false
+        default: true
     secrets:
       DOCKER_REGISTRY_USERNAME:
         required: false
@@ -51,10 +51,43 @@ on:
 
 jobs:
 
-  # Ubuntu arm runners aren't available for private repos, so keep old way
-  docker:
-    if: ${{ !inputs.use_native_runners }}
+  # Generate the build matrix from the platforms input so runner, scope, and
+  # artifact name can all be derived per-platform before build jobs start.
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate.outputs.matrix }}
+    steps:
+      -
+        name: Generate build matrix
+        id: generate
+        run: |
+          entries=()
+          IFS=',' read -ra platforms <<< "${PLATFORMS}"
+          for platform in "${platforms[@]}"; do
+            platform="${platform// /}"
+            safe="${platform//\//-}"
+            if [[ "${USE_NATIVE_RUNNERS}" == "true" && "$platform" == *"arm"* ]]; then
+              runner="ubuntu-24.04-arm"
+            else
+              runner="ubuntu-latest"
+            fi
+            entries+=("{\"platform\":\"$platform\",\"runner\":\"$runner\",\"scope\":\"$safe\",\"artifact\":\"digests-$safe\"}")
+          done
+          matrix="[$(IFS=,; echo "${entries[*]}")]"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+        env:
+          PLATFORMS: ${{ inputs.platforms }}
+          USE_NATIVE_RUNNERS: ${{ inputs.use_native_runners }}
+
+  # Build each platform on native runners (except on private repos, hence the switch)
+  build:
+    needs: [setup]
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.setup.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
     env:
       REGISTRY: ${{ inputs.registry }}
       DOCKER_USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
@@ -67,9 +100,6 @@ jobs:
           submodules: recursive
           persist-credentials: false
       -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4
-      -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4
       -
@@ -81,67 +111,9 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
       -
-        name: Docker Meta/Sanitize
-        id: meta
-        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6
-        with:
-          # If there's a username, set to registry/username/image_name, otherwise just image_name
-          images: ${{ env.DOCKER_USERNAME != null && format('{0}/{1}/', env.REGISTRY, env.DOCKER_USERNAME) || '' }}${{ inputs.image_name }}
-          tags: ${{ inputs.image_tag }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7
-        with:
-          context: ${{ inputs.context }}
-          file: ${{ inputs.dockerfile }}
-          push: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
-          platforms: ${{ inputs.platforms }}
-          tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  # Build each platform separately on native runners to get around QEMU issues
-  build:
-    if: ${{ inputs.use_native_runners && contains(inputs.platforms, matrix.platform) }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: linux/amd64
-            runner: ubuntu-latest
-            scope: linux-amd64
-            artifact: digests-amd64
-          - platform: linux/arm64
-            runner: ubuntu-24.04-arm
-            scope: linux-arm64
-            artifact: digests-arm64
-    runs-on: ${{ matrix.runner }}
-    env:
-      REGISTRY: ${{ inputs.registry }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          submodules: recursive
-          persist-credentials: false
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
-      -
-        name: Login to Registry
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
-        if: ${{ env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-      -
         name: Build and push by digest
         id: build
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7
         with:
           context: ${{ inputs.context }}
           file: ${{ inputs.dockerfile }}
@@ -160,7 +132,7 @@ jobs:
       -
         name: Upload digest
         if: ${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: ${{ matrix.artifact }}
           path: /tmp/digests/*
@@ -169,8 +141,8 @@ jobs:
 
   merge:
     # always() lets this run even if one platform job was skipped (single-platform builds)
-    if: ${{ always() && !failure() && !cancelled() && inputs.use_native_runners && inputs.should_push }}
-    needs: [build]
+    if: ${{ always() && !failure() && !cancelled() && inputs.should_push }}
+    needs: [setup, build]
     runs-on: ubuntu-latest
     env:
       REGISTRY: ${{ inputs.registry }}
@@ -179,14 +151,14 @@ jobs:
     steps:
       -
         name: Download digests
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           path: /tmp/digests
           pattern: digests-*
           merge-multiple: true
       -
         name: Login to Registry
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
@@ -194,7 +166,7 @@ jobs:
       -
         name: Docker Meta/Sanitize
         id: meta
-        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6
         with:
           images: ${{ env.DOCKER_USERNAME != null && format('{0}/{1}/', env.REGISTRY, env.DOCKER_USERNAME) || '' }}${{ inputs.image_name }}
           tags: ${{ inputs.image_tag }}

@@ -176,7 +176,7 @@ jobs:
         run: |
           docker buildx imagetools create \
             $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${REGISTRY}/${DOCKER_USERNAME}/${IMAGE_NAME}@sha256:%s ' *)
+            $(printf "${REGISTRY}/${DOCKER_USERNAME}/${IMAGE_NAME}@sha256:%s " *)
         env:
           REGISTRY: ${{ inputs.registry }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}

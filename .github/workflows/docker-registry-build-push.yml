@@ -118,7 +118,7 @@ jobs:
           context: ${{ inputs.context }}
           file: ${{ inputs.dockerfile }}
           platforms: ${{ matrix.platform }}
-          outputs: type=image,name=${{ inputs.registry }}/${{ env.DOCKER_USERNAME }}/${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
+          outputs: type=image,name=${{ env.DOCKER_USERNAME != null && format('{0}/{1}/', inputs.registry, env.DOCKER_USERNAME) || '' }}${{ inputs.image_name }},push-by-digest=true,name-canonical=true,push=${{ inputs.should_push && env.DOCKER_USERNAME != null && env.DOCKER_PASSWORD != null }}
           cache-from: type=gha,scope=${{ matrix.scope }}
           cache-to: type=gha,mode=max,scope=${{ matrix.scope }}
       -
